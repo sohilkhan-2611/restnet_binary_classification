@@ -1,0 +1,27 @@
+# Training Configuration
+
+model:
+  pretrained_name: "microsoft/resnet-18"  #The Hugging Face model checkpoint to start training from 
+  id2label:       #Maps numerical labels to human-readable names.
+    0: "Even"
+    1: "Odd"
+  label2id:       #Maps human-readable labels back to numerical labels.
+    Even: 0
+    Odd: 1
+
+training:
+  output_dir: "./results"     #Directory where training outputs (logs, checkpoints) are stored
+  save_dir: "./saved_model"   #Directory to save the final trained model
+  logging_dir: "./logs"       #Directory to save TensorBoard logs
+  eval_strategy: "epoch"      #How often to run evaluation 
+  save_strategy: "epoch"      #How often to save checkpoints
+  learning_rate: 2e-4         #Step size for optimizer (2e-4)
+  batch_size: 16             #Number of samples per training step.
+  epochs: 1                  #Number of full passes through the training dataset.
+  weight_decay: 0.01        #Regularization term to prevent overfitting
+  eval_steps: 500      
+  save_steps: 500        #Steps interval for evaluation and saving (500 steps here)
+  train_dataset: "data/processed/train"
+  val_dataset: "data/processed/val"       # Paths to the preprocessed datasets saved on disk
+  test_dataset: "data/processed/test"
+

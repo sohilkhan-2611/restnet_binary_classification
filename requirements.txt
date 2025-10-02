@@ -1,0 +1,13 @@
+torch>=2.0.0          # Core PyTorch library for building and training neural networks
+torchvision>=0.15.0    # Utilities for image transformations, datasets, and pretrained models
+transformers>=4.56.0   # Hugging Face library for pretrained models (ResNet-18 for image classification)
+datasets>=2.14.0       # Hugging Face Datasets library for loading, processing, and saving datasets
+evaluate>=0.4.0        # Evaluation metrics like accuracy, F1, precision, recall
+numpy>=1.21.0          # General numerical computations and array manipulations
+pillow>=8.3.0          # Image processing (loading, resizing, converting channels)
+pyyaml>=5.4.0          # Reading and parsing YAML configuration files
+matplotlib>=3.4.0      # Visualizing images and plots
+tqdm>=4.62.0           # Progress bars for loops and dataset preprocessing
+tensorboard>=2.7.0     # Logging and visualizing training metrics
+accelerate>=0.26.0     # Distributed training and efficient model acceleration
+scikit-learn

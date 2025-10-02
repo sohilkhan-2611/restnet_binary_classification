@@ -1,0 +1,28 @@
+venv/
+__pycache__/
+*.pt
+*.pth
+*.h5
+*.ckpt
+*.log
+*.npy
+*.npz
+saved_model/
+data/processed/test/
+data/processed/train/
+data/processed/val/
+logs/
+outputs/
+results/
+
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Ignore environment and package files
+.env
+.venv
+ENV/
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
