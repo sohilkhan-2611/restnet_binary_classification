@@ -306,31 +306,7 @@ The model is evaluated using multiple metrics:
 
 ### Performance Report
 
-The inference script generates a detailed report at `results/model_performance.txt`:
-
-```
-==================================================
-FINAL MODEL PERFORMANCE REPORT
-==================================================
-Test Date: 2025-10-03 19:34:10
-Model: ./saved_model
-Test Samples: 10000
-
-==============================
-PERFORMANCE METRICS:
-==============================
-Accuracy:  0.9922 (99.22%)
-F1 Score:  0.9922 (99.22%)
-Precision: 0.9922 (99.22%)
-Recall:    0.9922 (99.22%)
-Loss:      0.027233
-
-==============================
-PERFORMANCE SUMMARY:
-==============================
-OUTSTANDING: Model performance is excellent
-Error Rate: 0.78%
-```
+The inference script generates a detailed report at `results/model_performance.txt`
 
 ## 📈 Results
 
