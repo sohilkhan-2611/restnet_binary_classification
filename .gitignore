@@ -7,7 +7,6 @@ __pycache__/
 *.log
 *.npy
 *.npz
-saved_model/
 data/processed/test/
 data/processed/train/
 data/processed/val/

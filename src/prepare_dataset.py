@@ -1,4 +1,4 @@
-# dataset_manager.py
+# prepare_dataset.py
 from datasets import load_dataset
 from transformers import AutoImageProcessor
 import matplotlib.pyplot as plt
@@ -42,7 +42,7 @@ class MNISTEvenOddDatasetManager:
         2. Transform labels to binary (even=0, odd=1)
         3. Split into train/validation/test sets
         """
-        print("📥 Loading MNIST dataset...")
+        print("Loading MNIST dataset...")
         
         # Load original MNIST dataset
         self.dataset = load_dataset(

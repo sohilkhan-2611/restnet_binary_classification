@@ -40,21 +40,28 @@ def compute_metrics(eval_pred):
 
 
 def collate_fn(batch):
-    """Custom data collator for image classification."""
-    # Convert pixel_values to tensors if they're lists/numpy arrays
     pixel_values = []
+    labels = []
+    
     for x in batch:
         pixel_data = x["pixel_values"]
+        
+        # Convert list or ndarray to tensor 
         if isinstance(pixel_data, list):
-            # Convert list to tensor
-            pixel_data = torch.tensor(pixel_data)
+            pixel_data = torch.tensor(pixel_data, dtype=torch.float32)
         elif isinstance(pixel_data, np.ndarray):
-            # Convert numpy array to tensor
-            pixel_data = torch.from_numpy(pixel_data)
+            pixel_data = torch.from_numpy(pixel_data).float()
+        # Ensure it's float tensor
+        elif isinstance(pixel_data, torch.Tensor):
+            pixel_data = pixel_data.float()
+        
         pixel_values.append(pixel_data)
+        labels.append(x["label"])
     
+    # Stack into batch tensor
     pixel_values = torch.stack(pixel_values)
-    labels = torch.tensor([x["label"] for x in batch])
+    labels = torch.tensor(labels)
+    
     return {"pixel_values": pixel_values, "labels": labels}
 
 def main():
