@@ -18,10 +18,12 @@ save_dir = "./saved_model"
 model = AutoModelForImageClassification.from_pretrained(save_dir,local_files_only=True)
 processor = AutoImageProcessor.from_pretrained(save_dir,local_files_only=True)
 
+
 #Moves the model to GPU if available
 device = "cuda" if torch.cuda.is_available() else "cpu"
 model.to(device)
 model.eval()        #Sets model to evaluation mode to disable gradients.
+
 
 # Load preprocessed dataset
 test_dataset = load_from_disk("data/processed/test")    #Loads preprocessed test dataset (from prepare_dataset.py)
