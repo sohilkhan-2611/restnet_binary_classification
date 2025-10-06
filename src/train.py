@@ -1,35 +1,55 @@
 # train.py
+"""
+    This script handles training, evaluation, and saving of a ResNet-18 model for binary classification 
+    of MNIST digits (even vs odd) using the Hugging Face Transformers library
+"""
+
 import os
-os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
+os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"  ##Enable fallback on Mac MPS (Metal) if GPU not available
 import yaml
-from prepare_dataset import MNISTEvenOddDatasetManager
-from transformers import (
+from prepare_dataset import MNISTEvenOddDatasetManager      # Imports dataset manager
+from transformers import (                                  # and Hugging Face model/processor, Trainer API
     AutoModelForImageClassification,
     AutoImageProcessor,
     TrainingArguments,
     Trainer
 )
 import numpy as np
-import evaluate
+import evaluate             #Imports evaluation metrics and torch utilities
 import torch
 from datasets import load_from_disk, Dataset
 from pathlib import Path  
 
 def load_config(config_path="config/training.yaml"):
+
     """Load training config from YAML file."""
+
     with open(config_path, "r") as f:
         return yaml.safe_load(f)
 
 
 def compute_metrics(eval_pred):
-    """Compute accuracy, precision, recall, f1."""
+
+    """Compute accuracy, precision, recall, f1"""
+
+
+	#Inputs: eval_pred – tuple of (logits, labels) from model predictions
     logits, labels = eval_pred
     predictions = np.argmax(logits, axis=-1)
+
 
     accuracy = evaluate.load("accuracy")
     f1 = evaluate.load("f1")
     precision = evaluate.load("precision")
     recall = evaluate.load("recall")
+
+    """
+        Outputs: Dictionary with:
+        •	accuracy
+        •	f1 (macro-averaged)
+        •	precision (macro)
+        •	recall (macro)
+    """
 
     return {
         "accuracy": accuracy.compute(predictions=predictions, references=labels)["accuracy"],
@@ -40,9 +60,18 @@ def compute_metrics(eval_pred):
 
 
 def collate_fn(batch):
+
+    """Prepare batch data for model input"""
     pixel_values = []
     labels = []
     
+    """
+		Steps:
+	    •Converts pixel_values (list, ndarray, or tensor) to torch.float32.
+	    •Stacks images into batch tensor.
+	    •Collects labels into tensor.
+    """
+
     for x in batch:
         pixel_data = x["pixel_values"]
         
@@ -62,14 +91,15 @@ def collate_fn(batch):
     pixel_values = torch.stack(pixel_values)
     labels = torch.tensor(labels)
     
+    #Returns: Dictionary {"pixel_values": tensor, "labels": tensor} suitable for Hugging Face Trainer
     return {"pixel_values": pixel_values, "labels": labels}
 
 def main():
-    #Load configs
+    #Loads training hyperparameters and dataset paths
     train_config = load_config("config/training.yaml")
     dataset_config_path = "config/dataset.yaml"
 
-    #Load Datasets
+    #Load Preprocessed Datasets
     train_ds = load_from_disk(train_config["training"]["train_dataset"])
     val_ds = load_from_disk(train_config["training"]["val_dataset"])
     test_ds = load_from_disk(train_config["training"]["test_dataset"])
@@ -80,6 +110,12 @@ def main():
 
 
     # Load model + processor
+
+    """
+    	Model: ResNet-18 for image classification, fine-tuned for 2 labels
+        Processor: Handles image resizing, normalization, and conversion to tensors
+    """
+
     model = AutoModelForImageClassification.from_pretrained(
         train_config["model"]["pretrained_name"],
         num_labels=2,
@@ -90,7 +126,12 @@ def main():
 
     processor = AutoImageProcessor.from_pretrained(train_config["model"]["pretrained_name"])
 
-    #Training arguments
+    #Define Training Arguments
+
+    """
+        Contains all hyperparameters and training setup for Hugging Face Trainer
+        Enables evaluation, checkpointing, and logging
+    """
     training_args = TrainingArguments(
         output_dir=train_config["training"]["output_dir"],
         eval_strategy=train_config["training"]["eval_strategy"],  
@@ -116,6 +157,11 @@ def main():
     )
 
     #Trainer
+
+    """
+        Wraps the model, data, metrics, and arguments into Hugging Face Trainer
+        Handles training loop, evaluation, checkpointing, and metric computation
+    """
     trainer = Trainer(
         model=model,
         args=training_args,
@@ -126,18 +172,25 @@ def main():
         compute_metrics=compute_metrics
     )
 
-    # Train
+    # Train : Starts the fine-tuning process
     trainer.train()
 
-    # Evaluate
+    # Evaluate : Evaluates model on unseen test set
     results = trainer.evaluate(test_ds)
     print("Test Results:", results)
 
     # Save final model
+
+    """Saves model weights and processor for future inference"""
+
     trainer.save_model(train_config["training"]["save_dir"])
     processor.save_pretrained(train_config["training"]["save_dir"])
     print(f"Model saved at {train_config['training']['save_dir']}")
 
 
 if __name__ == "__main__":
+    """
+        Script runs end-to-end when executed.
+        Full pipeline: load dataset → train → evaluate → save model
+    """
     main()

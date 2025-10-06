@@ -13,6 +13,7 @@ data/processed/val/
 logs/
 outputs/
 results/
+tmp_trainer/runs
 
 # Ignore Jupyter Notebook checkpoints
 .ipynb_checkpoints/
