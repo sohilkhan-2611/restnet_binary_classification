@@ -1,4 +1,10 @@
 # inference.py
+
+"""
+    This script handles loading a trained ResNet-18 model, evaluating it on the 
+    preprocessed test dataset, computing key metrics, and saving a performance report.
+
+"""
 import torch
 from datasets import load_from_disk
 from transformers import AutoModelForImageClassification, AutoImageProcessor, Trainer
@@ -15,16 +21,23 @@ processor = AutoImageProcessor.from_pretrained(save_dir,local_files_only=True)
 #Moves the model to GPU if available
 device = "cuda" if torch.cuda.is_available() else "cpu"
 model.to(device)
-model.eval()
+model.eval()        #Sets model to evaluation mode to disable gradients.
 
 # Load preprocessed dataset
-test_dataset = load_from_disk("data/processed/test")
+test_dataset = load_from_disk("data/processed/test")    #Loads preprocessed test dataset (from prepare_dataset.py)
 
 # collate function
 def collate_fn(batch):
     pixel_values = []
     labels = []
-    
+
+    """
+	Converts pixel values from list/ndarray to torch.Tensor
+	Stacks batch tensors
+	Collects labels as tensor
+	Returns dictionary suitable for Hugging Face Trainer
+    """
+
     for x in batch:
         pixel_data = x["pixel_values"]
         
@@ -49,6 +62,9 @@ def collate_fn(batch):
 
     
 # Metrics
+
+""" Prepares metric calculators for evaluation """
+
 accuracy = evaluate.load("accuracy")
 f1 = evaluate.load("f1")
 precision = evaluate.load("precision")
@@ -57,6 +73,7 @@ recall = evaluate.load("recall")
 
 #Function to compute metrics
 def compute_metrics(eval_pred):
+    """ Computes accuracy, F1, precision, recall using predictions from the model """
     logits, labels = eval_pred
     preds = np.argmax(logits, axis=-1)
     return {
