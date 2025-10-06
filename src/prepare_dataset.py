@@ -29,7 +29,9 @@ class MNISTEvenOddDatasetManager:
         self.test_dataset = None
         
     def _load_config(self, config_path: str) -> Dict[str, Any]:
+        
         """Load configuration from YAML file."""
+
         with open(config_path, 'r') as file:
             return yaml.safe_load(file)
     
@@ -99,22 +101,27 @@ class MNISTEvenOddDatasetManager:
         self._print_split_info()
     
     def setup_processor(self) -> None:
-        """Initialize the image processor for ResNet-18."""
-        print("🔧 Setting up image processor...")
+
+        """Initializes the Hugging Face image processor (AutoImageProcessor) for ResNet-18"""
+
+        print("Setting up image processor...")
         
         self.processor = AutoImageProcessor.from_pretrained(
             self.config['model']['pretrained_name']
         )
         
+        """Ensures images are processed correctly for model input"""
+
         print("Image processor initialized!")
     
+
     def preprocess_images(self) -> None:
         """
         Preprocess images for ResNet-18 model.
         
         Processing includes:
         - Resizing to 224x224
-        - Normalization
+        - Normalize pixel values
         - Channel conversion (grayscale to RGB)
         """
         print("Preprocessing images for ResNet-18...")
@@ -162,19 +169,25 @@ class MNISTEvenOddDatasetManager:
         print("Image preprocessing completed!")
     
     def verify_dataset(self) -> None:
+
         """Comprehensive verification of the dataset."""
+
         print("\n" + "="*50)
-        print("🔍 DATASET VERIFICATION REPORT")
+        print("DATASET VERIFICATION REPORT")
         print("="*50)
         
-        self._print_dataset_structure()
-        self._verify_label_distribution()
-        self._check_sample_quality()
+        #Checks Performed
+        self._print_dataset_structure()     #Dataset structure (splits and features)
+        self._verify_label_distribution()   #Label distribution
+        self._check_sample_quality()        #Sample quality (image size, tensor shape)
         
         print("All verifications passed!")
+
     
     def _print_dataset_info(self, title: str) -> None:
+
         """Print dataset structure information."""
+
         print(f"\n {title}:")
         print(f"   Type: {type(self.dataset)}")
         if hasattr(self.dataset, 'keys'):
@@ -182,14 +195,18 @@ class MNISTEvenOddDatasetManager:
                 print(f"   {split_name}: {len(split_data)} samples")
     
     def _print_split_info(self) -> None:
+
         """Print information about dataset splits."""
+
         print(f"\n Dataset Split Sizes:")
         print(f"   Train: {len(self.train_dataset):,} samples")
         print(f"   Validation: {len(self.val_dataset):,} samples") 
         print(f"   Test: {len(self.test_dataset):,} samples")
     
     def _verify_label_distribution(self) -> None:
+
         """Verify label distribution across splits."""
+
         print(f"\n Label Distribution Analysis:")
         
         if self.dataset:
@@ -216,7 +233,9 @@ class MNISTEvenOddDatasetManager:
                     print(f"     {label_name}: {count:,} samples ({percentage:.1f}%)")
     
     def _print_dataset_structure(self) -> None:
+
         """Print detailed dataset structure."""
+
         print(f"\n Dataset Structure:")
         
         for split_name, dataset_split in [
@@ -247,7 +266,9 @@ class MNISTEvenOddDatasetManager:
                                     print(f"     First item type: {type(pixel_vals[0])}")
     
     def _check_sample_quality(self) -> None:
+
         """Check sample quality and preprocessing."""
+
         print(f"\n Sample Quality Check:")
         
         if self.train_dataset and len(self.train_dataset) > 0:
@@ -318,6 +339,7 @@ class MNISTEvenOddDatasetManager:
             val_dataset (Dataset): Preprocessed validation dataset
             test_dataset (Dataset): Preprocessed test dataset
             save_dir (str): Directory path to save datasets
+
         """
         save_path = Path(save_dir)
         save_path.mkdir(parents=True,exist_ok=True)
@@ -332,12 +354,18 @@ class MNISTEvenOddDatasetManager:
     
     def run_pipeline(self) -> Tuple[Any, Any, Any]:
         """
-        Execute the complete dataset processing pipeline.
-        
-        Returns:
-            Tuple of (train_dataset, val_dataset, test_dataset)
+        Execute the complete dataset processing pipeline end to end
+
+            1.	Load dataset
+            2.	Transform labels
+            3.	Create train/val/test splits
+            4.	Setup image processor
+            5.	Preprocess images
+            6.	Verify dataset
+            7.	Save datasets
+            
         """
-        print(" Starting dataset processing pipeline...")
+        print("Starting dataset processing pipeline...")
         
         self.load_dataset()
         self.transform_labels()
@@ -348,7 +376,7 @@ class MNISTEvenOddDatasetManager:
         self.save_preprocessed_datasets(self.train_dataset, self.val_dataset, self.test_dataset)
 
 
-        print(" Dataset pipeline completed successfully!")
+        print("Dataset pipeline completed successfully!")
         
         return self.train_dataset, self.val_dataset, self.test_dataset
 
